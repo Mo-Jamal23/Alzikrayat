@@ -1,0 +1,1 @@
+<div class="text-center py-5"><div class="eyebrow">404</div><h1 class="display-5 fw-bold">Page not found</h1><p class="text-secondary">The requested resource does not exist.</p><a class="btn btn-dark" href="<?= baseUrl('') ?>">Return home</a></div>

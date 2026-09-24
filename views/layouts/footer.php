@@ -1,0 +1,1 @@
+</main><footer class="border-top mt-5 py-4"><div class="container d-flex justify-content-between small text-secondary"><span>Alzikrayat Photo Sharing</span><span>Advanced Web Technologies</span></div></footer><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script></body></html>
