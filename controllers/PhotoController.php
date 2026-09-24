@@ -1,0 +1,10 @@
+<?php
+class PhotoController {
+ private Photo $photos; private Comment $comments; public function __construct(){ $this->photos=new Photo(); $this->comments=new Comment(); }
+ public function index(): void { render('photos/index',['title'=>'Photo Gallery','photos'=>$this->photos->all()]); }
+ public function create(): void { requireAuth(); render('photos/create',['title'=>'Upload Photo']); }
+ public function show(string $id): void { $photo=$this->photos->find((int)$id); if(!$photo){ http_response_code(404); render('home/404',['title'=>'Photo Not Found']); return; } render('photos/show',['title'=>$photo['title'],'photo'=>$photo,'comments'=>$this->comments->forPhoto((int)$id)]); }
+ public function store(): void { requireAuth(); verifyCsrf(); $title=trim($_POST['title']??''); $description=trim($_POST['description']??''); if($title==='' || empty($_FILES['image']['tmp_name'])){ flash('error','Title and image are required.'); redirect('photo/create'); } $file=$_FILES['image']; $allowed=['image/jpeg'=>'jpg','image/png'=>'png','image/gif'=>'gif','image/webp'=>'webp']; $mime=(new finfo(FILEINFO_MIME_TYPE))->file($file['tmp_name']); if(!isset($allowed[$mime]) || $file['size']>5*1024*1024){ flash('error','Use a JPG, PNG, GIF, or WebP image up to 5MB.'); redirect('photo/create'); } $name=bin2hex(random_bytes(12)).'.'.$allowed[$mime]; $target=__DIR__.'/../public/images/uploads/'.$name; if(!move_uploaded_file($file['tmp_name'],$target)){ flash('error','Upload failed.'); redirect('photo/create'); } $this->photos->create((int)currentUser()['id'],$name,$title,$description); flash('success','Photo uploaded successfully.'); redirect('photos'); }
+ public function delete(string $id): void { requireAuth(); verifyCsrf(); $photo=$this->photos->find((int)$id); if(!$photo || (int)$photo['user_id']!==(int)currentUser()['id']){ http_response_code(403); exit('You can only delete your own photos.'); } $this->photos->delete((int)$id,(int)currentUser()['id']); $path=__DIR__.'/../public/images/uploads/'.$photo['file_name']; if(is_file($path)) unlink($path); flash('success','Photo deleted.'); redirect('photos'); }
+}
+?>
